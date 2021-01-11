@@ -34,6 +34,17 @@ DO_2S_CONVERGENCE=FALSE
 INCLUDE_LOCATIONS +=$(PELE_PHYSICS_HOME)/ThirdParty/INSTALL/gcc/include/
 LIBRARY_LOCATIONS +=$(PELE_PHYSICS_HOME)/ThirdParty/INSTALL/gcc/lib/
 
+# ASCENT
+#CONDUIT_DIR = /gpfs/alpine/csc340/proj-shared/larsen/pele_test_build/ascent/uberenv_libs/spack/opt/spack/linux-rhel7-power9le/gcc-6.4.0/conduit-develop-7snndfpm6h2e2twrjv33vtcbzwis2twx
+ASCENT_DIR = /gpfs/alpine/proj-shared/csc340/larsen/pele_test_build/ascent/install
+include $(ASCENT_DIR)/share/ascent/ascent_config.mk
+
+USE_ASCENT      = TRUE
+USE_CONDUIT     = TRUE
+LIBRARIES += $(ASCENT_MPI_LIB_FLAGS) $(ASCENT_LINK_RPATH)
+INCLUDE_LOCATIONS += $(ASCENT_INCLUDE_FLAGS)
+
+
 ifeq ($(DO_2S_CONVERGENCE),TRUE)
 	Chemistry_Model = chem-CH4-2step
 	F90EXE_sources += 2step_Phi0.8_refined_CubicInterp.F90

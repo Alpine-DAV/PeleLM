@@ -1,4 +1,4 @@
-CEXE_sources += PeleLM_setup.cpp PeleLM.cpp PeleLM_derive.cpp PeleLM_bcfill.cpp
+CEXE_sources += PeleLM_setup.cpp PeleLM.cpp PeleLM_derive.cpp PeleLM_bcfill.cpp PeleLM_Ascent.cpp
 CEXE_headers += PeleLM.H  ArrayViewEXT.H BoxLib_Data_Dump.H PeleLM_K.H PeleLM_derive.H IndexDefines.H
 
 CEXE_headers += pelelm_prob.H pelelm_prob_parm.H PeleLM_parm.H

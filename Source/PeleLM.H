@@ -331,9 +331,9 @@ public:
   static void read_particle_params ();
 #endif
 
-#ifdef USE_ASCENT
+//#ifdef USE_ASCENT
   virtual void goAscent (int nstep);
-#endif
+//#endif
 
   // enum YdotAction { HT_EstimateYdotNew, HT_ImproveYdotOld, HT_LeaveYdotAlone };
   // enum Solver_Status {HT_InProgress, HT_Stalled, HT_Solved};
