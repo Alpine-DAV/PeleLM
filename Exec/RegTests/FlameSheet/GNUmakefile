@@ -31,6 +31,9 @@ USE_KLU_PP      = FALSE
 # PeleLM options
 DO_2S_CONVERGENCE=FALSE
 
+INCLUDE_LOCATIONS +=$(PELE_PHYSICS_HOME)/ThirdParty/INSTALL/gcc/include/
+LIBRARY_LOCATIONS +=$(PELE_PHYSICS_HOME)/ThirdParty/INSTALL/gcc/lib/
+
 ifeq ($(DO_2S_CONVERGENCE),TRUE)
 	Chemistry_Model = chem-CH4-2step
 	F90EXE_sources += 2step_Phi0.8_refined_CubicInterp.F90
@@ -69,6 +72,7 @@ CEXE_sources +=
 F90EXE_sources +=
 CEXE_headers += 
 FEXE_headers += 
+
 
 include $(PELELM_HOME)/Tools/Make/Make.PeleLM
 # Available chemistry models:

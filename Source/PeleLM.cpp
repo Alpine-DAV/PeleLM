@@ -208,7 +208,6 @@ Vector<Real> PeleLM::typical_values;
 int PeleLM::sdc_iterMAX;
 int PeleLM::num_mac_sync_iter;
 int PeleLM::deltaT_verbose = 0;
-int PeleLM::deltaT_crashOnConvFail = 1;
 
 int PeleLM::mHtoTiterMAX;
 Vector<amrex::Real> PeleLM::mTmpData;
@@ -251,8 +250,8 @@ PeleLM::timestamp_num_extras ()
 
 void
 PeleLM::timestamp_add_extras (int lev,
-				    Real time,
-				    MultiFab& mf)
+            Real time,
+            MultiFab& mf)
 {
   if (do_curvature_sample)
   {
@@ -444,7 +443,7 @@ PeleLM::Initialize ()
   {
     if (verbose)
       amrex::Print() << "PeleLM::read_params: using a constant thickening factor = " 
-		     << constant_thick_val << '\n';
+         << constant_thick_val << '\n';
   }
 
   pp.query("hack_nochem",hack_nochem);
@@ -502,7 +501,7 @@ PeleLM::Initialize ()
     if (ShowMF_Verbose>0 && ShowMF_set_names.size()>0) {
       amrex::Print() << "   ******************************  Debug: ShowMF_Sets: ";
       for (int i=0; i<ShowMF_set_names.size(); ++i) {
-	amrex::Print() << ShowMF_set_names[i] << " ";
+  amrex::Print() << ShowMF_set_names[i] << " ";
       }
       amrex::Print() << '\n';
     }
@@ -545,7 +544,6 @@ PeleLM::Initialize_specific ()
     pplm.query("num_deltaT_iters_MAX",num_deltaT_iters_MAX);
     pplm.query("deltaT_norm_max",deltaT_norm_max);
     pplm.query("deltaT_verbose",deltaT_verbose);
-    pplm.query("deltaT_convFailCrash",deltaT_crashOnConvFail);
 
     pplm.query("use_typ_vals_chem",use_typ_vals_chem);
     pplm.query("relative_tol_chem",relative_tol_chem);
@@ -728,7 +726,7 @@ showMFsub(const std::string&   mySet,
 
     if (ShowMF_Verbose>0) {
       amrex::Print() << "   ******************************  Debug: writing " 
-		     << junkname << '\n';
+         << junkname << '\n';
     }
 
     FArrayBox sub(box,mf.nComp());
@@ -780,7 +778,7 @@ showMF(const std::string&   mySet,
 
     if (ShowMF_Verbose>0) {
       amrex::Print() << "   ******************************  Debug: writing " 
-		     << junkname << '\n';
+         << junkname << '\n';
     }
 
 #if 0
@@ -1427,8 +1425,8 @@ PeleLM::set_typical_values(bool is_restart)
 
       for (int i=0; i<NUM_STATE - AMREX_SPACEDIM; ++i) {
         typical_values[i + AMREX_SPACEDIM] = std::abs(scaleMax[i] - scaleMin[i]);
-		  if ( typical_values[i + AMREX_SPACEDIM] <= 0.0)
-			  typical_values[i + AMREX_SPACEDIM] = 0.5*std::abs(scaleMax[i] + scaleMin[i]);
+      if ( typical_values[i + AMREX_SPACEDIM] <= 0.0)
+        typical_values[i + AMREX_SPACEDIM] = 0.5*std::abs(scaleMax[i] + scaleMin[i]);
       }
 
       for (int i=0; i<AMREX_SPACEDIM; ++i) {
@@ -1493,7 +1491,7 @@ PeleLM::set_typical_values(bool is_restart)
       Vector<Real> typical_values_chem;
       typical_values_chem.resize(NUM_SPECIES+1);
       for (int i=0; i<NUM_SPECIES; ++i) {
-	      typical_values_chem[i] = typical_values[first_spec+i] * typical_values[Density];
+        typical_values_chem[i] = typical_values[first_spec+i] * typical_values[Density];
       }
       typical_values_chem[NUM_SPECIES] = typical_values[Temp];
       SetTypValsODE(typical_values_chem);
@@ -2219,6 +2217,9 @@ PeleLM::checkPoint (const std::string& dir,
                     VisMF::How         how,
                     bool               dump_old)
 {
+
+  goAscent(parent->levelSteps(0));
+
   NavierStokesBase::checkPoint(dir,os,how,dump_old);
 
   if (level == 0)
@@ -2402,7 +2403,7 @@ PeleLM::post_init (Real stop_time)
           MultiFab& Divu_crse = crse_lev.get_new_data(Divu_Type);
           MultiFab& Divu_fine = fine_lev.get_new_data(Divu_Type);
 
-	  crse_lev.average_down(Divu_fine, Divu_crse, 0, 1);
+    crse_lev.average_down(Divu_fine, Divu_crse, 0, 1);
         }
       }
       //
@@ -2453,7 +2454,7 @@ PeleLM::post_init (Real stop_time)
         MultiFab&       S_fine  = getLevel(k+1).get_new_data(State_Type);
         MultiFab&       S_crse  = getLevel(k).get_new_data(State_Type);
 
-	crse_lev.average_down(S_fine, S_crse, Xvel, AMREX_SPACEDIM);
+  crse_lev.average_down(S_fine, S_crse, Xvel, AMREX_SPACEDIM);
       }
     }
     //
@@ -2535,7 +2536,7 @@ PeleLM::sum_integrated_quantities ()
       std::string product = "rho.Y(" + productName + ")";
       for (int lev = 0; lev <= finest_level; lev++) {
         productmass += getLevel(lev).volWgtSum(product,tnp1);
-      }	  
+      }   
       Print() << " PRODUCTMASS= " << productmass;
     }
     Print() << '\n';
@@ -2681,11 +2682,11 @@ PeleLM::post_init_press (Real&        dt_init,
       {
         PeleLM&   fine_lev = getLevel(k+1);
         PeleLM&   crse_lev = getLevel(k);
-	    
+      
         MultiFab& Divu_crse = crse_lev.get_new_data(Divu_Type);
         MultiFab& Divu_fine = fine_lev.get_new_data(Divu_Type);
 
-	crse_lev.average_down(Divu_fine, Divu_crse, 0, 1);
+  crse_lev.average_down(Divu_fine, Divu_crse, 0, 1);
       }
 
       // compute Sbar and subtract from S
@@ -2699,17 +2700,17 @@ PeleLM::post_init_press (Real&        dt_init,
         }
         divu_lev.plus(-Sbar_new,0,1);
       }
-	  
+    
       // ensure divu_old is average down so computing deltaS = S - Sbar works for multilevel
       for (int k = finest_level-1; k >= 0; k--)
       {
         PeleLM&   fine_lev = getLevel(k+1);
         PeleLM&   crse_lev = getLevel(k);
-		  
+      
         MultiFab& Divu_crse = crse_lev.get_old_data(Divu_Type);
         MultiFab& Divu_fine = fine_lev.get_old_data(Divu_Type);
 
-	crse_lev.average_down(Divu_fine, Divu_crse, 0, 1);
+  crse_lev.average_down(Divu_fine, Divu_crse, 0, 1);
       }
 
       // compute Sbar and subtract from S
@@ -2731,7 +2732,7 @@ PeleLM::post_init_press (Real&        dt_init,
       projector->initialSyncProject(0,sig,parent->dtLevel(0),tnp1,
                                     havedivu);
     }
-	
+  
     if (closed_chamber == 1)
     {
       // restore S_new
@@ -3438,10 +3439,8 @@ PeleLM::differential_diffusion_update (MultiFab& Force,
          });
       }
 
-      if ( L==(num_deltaT_iters_MAX-1) 
-           && deltaT_iter_norm >= deltaT_norm_max
-           && deltaT_crashOnConvFail ) {
-         Abort("deltaT_iters not converged");
+      if (L==(num_deltaT_iters_MAX-1) && deltaT_iter_norm >= deltaT_norm_max) {
+        Abort("deltaT_iters not converged");
       }
    } // end deltaT iters
 
@@ -4733,7 +4732,7 @@ PeleLM::predict_velocity (Real  dt)
     //velpred=1 only, use_minion=1, ppm_type, slope_order
     Godunov::ExtrapVelToFaces( Umf, forcing_term, AMREX_D_DECL(u_mac[0], u_mac[1], u_mac[2]),
                                m_bcrec_velocity, m_bcrec_velocity_d.dataPtr(), geom, dt,
-			       godunov_use_ppm, godunov_use_forces_in_trans );
+             godunov_use_ppm, godunov_use_forces_in_trans );
 
 #endif
 
@@ -5429,7 +5428,7 @@ PeleLM::advance (Real time,
    //====================================
 
 #ifdef AMREX_PARTICLES
-   if (theNSPC() != 0 && !initial_step)
+   if (theNSPC() != 0)
    {
       theNSPC()->AdvectWithUmac(u_mac, level, dt);
    }
@@ -5563,13 +5562,6 @@ PeleLM::getFuncCountDM (const BoxArray& bxba, int ngrow)
   fctmpnew.setVal(1);
 
   const MultiFab& FC = get_new_data(FuncCount_Type);
-
-  // Return original DM if FC is zero (propably Null reaction dir)
-  if ( FC.norm0(0) <= 0.0 ) {
-     DistributionMapping new_dmap{bxba};
-     return new_dmap;
-  }
-
   fctmpnew.copy(FC,0,0,1,std::min(ngrow,FC.nGrow()),0);
 
   int count = 0;
@@ -6038,10 +6030,10 @@ PeleLM::compute_scalar_advection_fluxes_and_divergence (const MultiFab& Force,
     BCRec  const* d_bcrec_ptr = &(m_bcrec_scalars_d.dataPtr())[Temp-Density];
 
     MOL::ComputeAofs( *aofs, Temp, 1, Smf, Tcomp,
-		      AMREX_D_DECL(u_mac[0],u_mac[1],u_mac[2]),
-		      AMREX_D_DECL(*EdgeState[0],*EdgeState[1],*EdgeState[2]), Temp, false,
-		      AMREX_D_DECL(*EdgeFlux[0],*EdgeFlux[1],*EdgeFlux[2]), Temp,
-		      math_bcs, d_bcrec_ptr, geom );
+          AMREX_D_DECL(u_mac[0],u_mac[1],u_mac[2]),
+          AMREX_D_DECL(*EdgeState[0],*EdgeState[1],*EdgeState[2]), Temp, false,
+          AMREX_D_DECL(*EdgeFlux[0],*EdgeFlux[1],*EdgeFlux[2]), Temp,
+          math_bcs, d_bcrec_ptr, geom );
     EB_set_covered(*aofs, 0.);
   }
 
@@ -6140,10 +6132,10 @@ PeleLM::compute_scalar_advection_fluxes_and_divergence (const MultiFab& Force,
      BCRec  const* d_bcrec_ptr = &(m_bcrec_scalars_d.dataPtr())[RhoH-Density];
 
      MOL::ComputeAofs( *aofs, RhoH, 1, Smf, NUM_SPECIES+1,
-		       AMREX_D_DECL(u_mac[0],u_mac[1],u_mac[2]),
-		       AMREX_D_DECL(*EdgeState[0],*EdgeState[1],*EdgeState[2]), RhoH, true,
-		       AMREX_D_DECL(*EdgeFlux[0],*EdgeFlux[1],*EdgeFlux[2]), RhoH,
-		       math_bcs, d_bcrec_ptr, geom ); 
+           AMREX_D_DECL(u_mac[0],u_mac[1],u_mac[2]),
+           AMREX_D_DECL(*EdgeState[0],*EdgeState[1],*EdgeState[2]), RhoH, true,
+           AMREX_D_DECL(*EdgeFlux[0],*EdgeFlux[1],*EdgeFlux[2]), RhoH,
+           math_bcs, d_bcrec_ptr, geom ); 
      EB_set_covered(*aofs, 0.);
   }
 
@@ -6877,9 +6869,7 @@ PeleLM::mac_sync ()
                });
             }
 
-            if ( L==(num_deltaT_iters_MAX-1) 
-                 && deltaT_iter_norm >= deltaT_norm_max
-                 && deltaT_crashOnConvFail ) {
+            if (L==(num_deltaT_iters_MAX-1) && deltaT_iter_norm >= deltaT_norm_max) {
                Abort("deltaT_iters not converged in mac_sync");
             }
          } // deltaT_iters
@@ -7016,7 +7006,7 @@ PeleLM::mac_sync ()
         MultiFab& S_crse_loc = crse_level.get_new_data(State_Type);
         MultiFab& S_fine_loc = fine_level.get_new_data(State_Type);
 
-	crse_level.average_down(S_fine_loc, S_crse_loc, RhoRT, 1);
+  crse_level.average_down(S_fine_loc, S_crse_loc, RhoRT, 1);
       }
       PeleLM& fine_level = getLevel(level+1);
       showMF("DBGSync",fine_level.get_new_data(State_Type),"sdc_SnewFine_EndSyncIter",level+1,mac_sync_iter,parent->levelSteps(level));
@@ -7216,7 +7206,7 @@ PeleLM::compute_Wbar_fluxes(Real time,
 
    // Define Wbar
    MultiFab Wbar;
-   Wbar.define(grids,dmap,1,nGrowOp,MFInfo(),Factory());
+   Wbar.define(grids,dmap,1,nGrowOp);
 
    // Get fillpatched rho and rhoY
    FillPatchIterator fpi(*this,Wbar,nGrowOp,time,State_Type,Density,NUM_SPECIES+1);
@@ -8474,8 +8464,8 @@ PeleLM::writePlotFile (const std::string& dir,
     }
 
 #ifdef AMREX_USE_EB
-	//add in vol frac
-	os << "volFrac\n";
+  //add in vol frac
+  os << "volFrac\n";
 #endif
 
     os << AMREX_SPACEDIM << '\n';
@@ -8518,7 +8508,7 @@ PeleLM::writePlotFile (const std::string& dir,
     jobInfoFile << PrettyLine;
     jobInfoFile << " Job Information\n";
     jobInfoFile << PrettyLine;
-	
+  
     jobInfoFile << "number of MPI processes: " << ParallelDescriptor::NProcs() << "\n";
 #ifdef _OPENMP
     jobInfoFile << "number of threads:       " << omp_get_max_threads() << "\n";
@@ -8593,10 +8583,10 @@ PeleLM::writePlotFile (const std::string& dir,
     jobInfoFile << PrettyLine;
     jobInfoFile << " Inputs File Parameters\n";
     jobInfoFile << PrettyLine;
-	
+  
     ParmParse::dumpTable(jobInfoFile, true);
 
-    jobInfoFile.close();	
+    jobInfoFile.close();  
 
   }
   // Build the directory to hold the MultiFab at this level.
@@ -8647,8 +8637,8 @@ PeleLM::writePlotFile (const std::string& dir,
     }
     
 #ifdef AMREX_USE_EB
-	// volfrac threshhold for amrvis
-	// fixme? pulled directly from CNS, might need adjustment
+  // volfrac threshhold for amrvis
+  // fixme? pulled directly from CNS, might need adjustment
         if (level == parent->finestLevel()) {
             for (int lev = 0; lev <= parent->finestLevel(); ++lev) {
                 os << "1.0e-6\n";
@@ -9251,3 +9241,4 @@ PeleLM::parseComposition(Vector<std::string> compositionIn,
       Abort("Unknown mixtureFraction.type ! Should be 'mass' or 'mole'");
    }
 }
+

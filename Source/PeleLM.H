@@ -331,6 +331,9 @@ public:
   static void read_particle_params ();
 #endif
 
+#ifdef USE_ASCENT
+  virtual void goAscent (int nstep);
+#endif
 
   // enum YdotAction { HT_EstimateYdotNew, HT_ImproveYdotOld, HT_LeaveYdotAlone };
   // enum Solver_Status {HT_InProgress, HT_Stalled, HT_Solved};
@@ -354,7 +357,7 @@ public:
                                               amrex::MultiFab* const * flux,
                                               const amrex::MultiFab* const * beta,
                                               amrex::Real dt,
-					      amrex::Real time,
+                amrex::Real time,
                                               bool  include_Wbar_fluxes);
 
   void compute_differential_diffusion_terms (amrex::MultiFab& D,
@@ -365,7 +368,7 @@ public:
 
   void compute_enthalpy_fluxes (amrex::MultiFab* const*       flux,
                                 const amrex::MultiFab* const* beta,
-				amrex::Real		      time);
+        amrex::Real         time);
 
   enum HowToFillGrow {HT_ZERO_GROW_CELLS, HT_EXTRAP_GROW_CELLS, HT_NUM_GROW_OPTIONS};
 
@@ -569,8 +572,8 @@ public:
                      const amrex::Real&      errMAX = -1);
 
   void HfromT_pphys(const int* lo, const int* hi,
-		     amrex::Real*       H, ARLIM_P(Hlo), ARLIM_P(Hhi),
-		     const amrex::Real* T, ARLIM_P(Tlo), ARLIM_P(Thi));
+         amrex::Real*       H, ARLIM_P(Hlo), ARLIM_P(Hhi),
+         const amrex::Real* T, ARLIM_P(Tlo), ARLIM_P(Thi));
 
   static void RhoH_to_Temp (amrex::MultiFab& S,
                             int       nGrow = 0,
@@ -689,7 +692,6 @@ public:
   static int         sdc_iterMAX;
   static int         num_mac_sync_iter;
   static int         deltaT_verbose;
-  static int         deltaT_crashOnConvFail;
   static int         iter_debug;
   static int         mHtoTiterMAX;
   static amrex::Vector<amrex::Real> mTmpData;
