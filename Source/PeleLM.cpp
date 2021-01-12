@@ -2218,8 +2218,6 @@ PeleLM::checkPoint (const std::string& dir,
                     bool               dump_old)
 {
 
-  goAscent(parent->levelSteps(0));
-
   NavierStokesBase::checkPoint(dir,os,how,dump_old);
 
   if (level == 0)
@@ -8747,6 +8745,7 @@ PeleLM::writePlotFile (const std::string& dir,
 //#endif
 
   VisMF::Write(plotMF,TheFullPath,how);
+  goAscent(parent->levelSteps(0));
 }
 
 std::unique_ptr<MultiFab>

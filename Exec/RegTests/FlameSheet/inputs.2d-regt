@@ -13,7 +13,8 @@ peleLM.hi_bc = Interior  Outflow
 #-------------------------AMR CONTROL----------------------------
 amr.n_cell          = 32 32 32         # Level 0 number of cells in each direction   
 amr.v               = 1                # AMR verbose
-amr.max_level       = 2                # maximum level number allowed
+#amr.max_level       = 2                # maximum level number allowed
+amr.max_level       = 0                # maximum level number allowed
 amr.ref_ratio       = 2 2 2 2          # refinement ratio
 amr.regrid_int      = 2                # how often to regrid
 amr.n_error_buf     = 1 1 2 2          # number of buffer cells in error est
@@ -34,7 +35,7 @@ amr.checkpoint_files_output = 1
 amr.check_file          = chk          # root name of checkpoint file
 amr.check_int           = 1            # number of timesteps between checkpoints
 amr.plot_file           = plt_         # root name of plot file
-amr.plot_int            = 100          # number of timesteps between plot files
+amr.plot_int            = 1          # number of timesteps between plot files
 amr.derive_plot_vars    = rhoRT mag_vort avg_pressure gradpx gradpy sumRhoYdot mass_fractions molweight rhominsumrhoY cc_transport_coeffs cpmix mixfrac_only enthalpy
 amr.grid_log            = grdlog       # name of grid logging file
 

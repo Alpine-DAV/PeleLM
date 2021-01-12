@@ -33,11 +33,20 @@ PeleLM::goAscent (int nstep)
 {
   amrex::Print() << " goAscent nstep " << nstep << std::endl;
   std::vector<std::pair<int,int> > plot_var_map;
+  Vector<std::string> var_names;
   for (int typ = 0; typ < desc_lst.size(); typ++)
+  {
      for (int comp = 0; comp < desc_lst[typ].nComp();comp++)
-        if (parent->isStatePlotVar(desc_lst[typ].name(comp)) &&
-      desc_lst[typ].getType() == IndexType::TheCellType())
-      plot_var_map.push_back(std::pair<int,int>(typ,comp));
+     {
+        if (parent->isStatePlotVar(desc_lst[typ].name(comp)) && 
+            desc_lst[typ].getType() == IndexType::TheCellType())
+        {
+          plot_var_map.push_back(std::pair<int,int>(typ,comp));
+          var_names.push_back(desc_lst[typ].name(comp));
+          amrex::Print()<<"Var "<<desc_lst[typ].name(comp)<<"\n";
+        }
+     }
+  }
 
   int n_data_items = plot_var_map.size();
   amrex::Print() << " n_data_items " << n_data_items << std::endl;
@@ -55,7 +64,6 @@ PeleLM::goAscent (int nstep)
         const int nGrow = 1;
         MultiFab  plotMF(grids,dmap,1,nGrow,MFInfo(),Factory());
         Vector<int> level_steps;
-        Vector<std::string> var_names;
         Vector<IntVect> ref_ratios;
 
         for(int lev = 0; lev <= parent->finestLevel(); ++lev)
@@ -79,7 +87,7 @@ PeleLM::goAscent (int nstep)
             int comp = plot_var_map[i].second;
             this_dat = &parent->getLevel(lev).get_new_data(type);
             MultiFab::Copy(*level_mf,*this_dat,comp,i,1,nGrow);
-            amrex::Print()<< "Copy cnt " << type << " " << comp << std::endl;
+            //amrex::Print()<< "Copy cnt " << type << " " << comp << std::endl;
             cnt++;
           }
 
