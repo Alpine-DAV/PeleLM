@@ -15,7 +15,7 @@ DIM             = 3
 COMP            = gnu
 USE_MPI         = TRUE
 USE_OMP         = FALSE
-USE_CUDA        = FALSE
+USE_CUDA        = TRUE 
 USE_HIP         = FALSE
 
 # MISC options
@@ -35,7 +35,7 @@ INCLUDE_LOCATIONS +=$(PELE_PHYSICS_HOME)/ThirdParty/INSTALL/gcc/include/
 LIBRARY_LOCATIONS +=$(PELE_PHYSICS_HOME)/ThirdParty/INSTALL/gcc/lib/
 
 # ASCENT
-ASCENT_DIR = /gpfs/alpine/proj-shared/csc340/larsen/pele_test_build/ascent/install
+ASCENT_DIR = /gpfs/alpine/world-shared/csc340/cokurt/ascent_cuda/install
 include $(ASCENT_DIR)/share/ascent/ascent_config.mk
 
 USE_ASCENT      = TRUE
