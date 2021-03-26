@@ -18,7 +18,7 @@
 AMREX_GPU_DEVICE
 AMREX_FORCE_INLINE
 void
-pelelm_initdata (int i, int j, int k, 
+pelelm_initdata (int i, int j, int k,
                  amrex::Array4<amrex::Real> const& state,
                  amrex::GeometryData const& geomdata,
                  ProbParm const& prob_parm,
@@ -45,11 +45,11 @@ pelelm_initdata (int i, int j, int k,
     amrex::Real y1, y2;
 
     pert = 0.0;
-    if (prob_parm.pertmag > 0.0) 
+    if (prob_parm.pertmag > 0.0)
     {
 
-#if ( AMREX_SPACEDIM == 2 ) 
-       pert = prob_parm.pertmag * 
+#if ( AMREX_SPACEDIM == 2 )
+       pert = prob_parm.pertmag *
              (1.0 * std::sin(2 * Pi * 4 * x / L_x) +
               1.023 * std::sin(2 * Pi * 2 * (x - 0.004598) / L_x) +
               0.945 * std::sin(2 * Pi * 3 * (x - 0.00712435) / L_x) +
@@ -62,7 +62,7 @@ pelelm_initdata (int i, int j, int k,
     y1 = (y - prob_parm.standoff - 0.5*dx[1] + pert)*100;
     y2 = (y - prob_parm.standoff + 0.5*dx[1] + pert)*100;
 
-#elif ( AMREX_SPACEDIM == 3 ) 
+#elif ( AMREX_SPACEDIM == 3 )
        const amrex::Real L_y = prob_hi[1] - prob_lo[1];
        pert = prob_parm.pertmag *
              (1.0 * std::sin(2 * Pi * 4 * x / L_x) *
@@ -91,9 +91,9 @@ pelelm_initdata (int i, int j, int k,
 
 
     state(i,j,k,Xvel) = 0;
-#if ( AMREX_SPACEDIM == 2 ) 
+#if ( AMREX_SPACEDIM == 2 )
     state(i,j,k,Yvel) = pmf_vals[1]*1e-2;
-#elif ( AMREX_SPACEDIM == 3 ) 
+#elif ( AMREX_SPACEDIM == 3 )
     state(i,j,k,Yvel) = 0;
     state(i,j,k,Zvel) = pmf_vals[1]*1e-2;
 #endif
