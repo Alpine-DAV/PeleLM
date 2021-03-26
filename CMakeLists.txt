@@ -24,6 +24,7 @@ option(PELELM_ENABLE_FCOMPARE_FOR_TESTS "Check test plots against gold files" OF
 option(PELELM_ENABLE_SANITIZE_FOR_TESTS "Currently only disables certain long running MMS tests if set" OFF)
 option(PELELM_ENABLE_FPE_TRAP_FOR_TESTS "Enable FPE trapping in tests" ON)
 option(PELELM_ENABLE_TINY_PROFILE "Enable tiny profiler in AMReX" OFF)
+option(PELELM_ENABLE_ASCENT "Enable Ascent in situ diagnostics" OFF)
 set(PELELM_PRECISION "DOUBLE" CACHE STRING "Floating point precision SINGLE or DOUBLE")
 
 #Options for performance
@@ -58,6 +59,14 @@ if(NOT PELELM_DIM MATCHES "^(2|3)$")
   message(FATAL_ERROR "PeleLM is only available for 2D or 3D.")
 endif()
 
+#needs so
+if(PELELM_ENABLE_ASCENT)
+  if(NOT ASCENT_DIR)
+    message(FATAL_ERROR "Ascent support requires an explicit ASCENT_DIR")
+  endif()
+  # tell AMRex where to find  ascent
+  set(Ascent_DIR "${ASCENT_DIR}/lib/cmake/ascent/")
+endif()
 ########################### AMReX #####################################
 
 message(STATUS "AMReX Configure Section")

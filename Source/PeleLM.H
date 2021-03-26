@@ -16,17 +16,17 @@
 #include <utility>
 
 //
-// Note: define TEMPERATURE if you want a variable T in the 
+// Note: define TEMPERATURE if you want a variable T in the
 //       State_Type part of the state
-//       whose component index is Temp and 
-//       whose evoution equation is 
+//       whose component index is Temp and
+//       whose evoution equation is
 //       \pd (rho T)/\pd t + diver (\rho U T) = \diver k/c_p grad T
 //       define RADIATION only if TEMPERATURE is also defined and the evolution equation
 //       for T is
 //       \pd (rho T)/\pd t + diver (\rho U T) = \diver k/c_p grad T - 1/c_p diver q_rad
 //
 //       Note that component Temp is T, not rho T. This was done so
-//       that we could use the existing diffusion operator and 
+//       that we could use the existing diffusion operator and
 //       multigrid code.
 //
 
@@ -59,24 +59,24 @@ public:
   LM_Error_Value()
     :
     lmef(0), lmef_box(0), value(), min_time(), max_time(), max_level() {}
-  
+
   LM_Error_Value (amrex::Real min_time, amrex::Real max_time, int max_level);
-  
+
   LM_Error_Value (LMEF lmef, amrex::Real value, amrex::Real min_time,
                   amrex::Real max_time, int max_level);
-  
+
   LM_Error_Value (LMEF_BOX lmef_box, const amrex::RealBox& box, amrex::Real min_time,
                   amrex::Real max_time, int max_level);
-  
+
   virtual ~LM_Error_Value () {}
-  
+
   virtual amrex::ErrorRec::ErrorFunc* clone () const override {
     if (BoxTag()) {
       return new LM_Error_Value(lmef_box,box,min_time,max_time,max_level);
     }
     return new LM_Error_Value(lmef,value,min_time,max_time,max_level);
   }
-  
+
   void tagCells(int* tag, const int* tlo, const int* thi,
                 const int* tagval, const int* clearval,
                 const amrex::Real* data, const int* dlo, const int* dhi,
@@ -93,13 +93,13 @@ public:
                  const amrex::Real* dx, const amrex::Real* xlo,
                  const amrex::Real* prob_lo, const amrex::Real* time,
                  const int* level) const;
-  
+
   int MaxLevel() const {return max_level;}
   amrex::Real MinTime() const {return min_time;}
   amrex::Real MaxTime() const {return max_time;}
   amrex::Real Value() const {return value;}
   bool BoxTag() const {return lmef==0 && lmef_box!=0;}
-  
+
 protected:
   LMEF lmef;
   LMEF_BOX lmef_box;
@@ -271,7 +271,7 @@ public:
                              const amrex::Real time) override;
 
   virtual void getViscTerms (amrex::MultiFab& visc_terms,
-                             int       src_comp, 
+                             int       src_comp,
                              int       num_comp,
                              amrex::Real      time) override;
 
@@ -309,7 +309,7 @@ public:
                          int                 clearval,
                          int                 tagval,
                          amrex::Real         time,
-                         int                 n_error_buf, 
+                         int                 n_error_buf,
                          int                 ngrow) override;
 
   ////////////////////////////////////////////////////////////////////////////
@@ -320,13 +320,16 @@ public:
   static void Initialize_specific ();
   static void init_mixture_fraction ();
   static void Finalize ();
-    
+
 #ifdef AMREX_PARTICLES
   virtual int timestamp_num_extras () override;
   virtual void timestamp_add_extras (int lev, amrex::Real time, amrex::MultiFab& mf) override;
   static void read_particle_params ();
 #endif
 
+#ifdef USE_ASCENT
+  virtual void goAscent (int nstep);
+#endif
 
   // enum YdotAction { HT_EstimateYdotNew, HT_ImproveYdotOld, HT_LeaveYdotAlone };
   // enum Solver_Status {HT_InProgress, HT_Stalled, HT_Solved};
@@ -399,7 +402,7 @@ public:
 
   void diffuse_velocity_setup (amrex::Real        dt,
                                amrex::MultiFab*&  delta_rhs,
-                               FluxBoxes&  fb_betan, 
+                               FluxBoxes&  fb_betan,
                                FluxBoxes&  fb_betanp1);
 
   void flux_divergence (amrex::MultiFab&        fdiv,
@@ -474,11 +477,11 @@ public:
                            amrex::MultiFab* const*                fluxn,
                            amrex::MultiFab* const*                fluxnp1,
                            int                                    fluxComp,
-                           amrex::MultiFab*                       delta_rhs, 
+                           amrex::MultiFab*                       delta_rhs,
                            int                                    rhsComp,
-                           const amrex::MultiFab*                 alpha, 
+                           const amrex::MultiFab*                 alpha,
                            int                                    alphaComp,
-                           const amrex::MultiFab* const*          betan, 
+                           const amrex::MultiFab* const*          betan,
                            const amrex::MultiFab* const*          betanp1,
                            int                                    betaComp,
                            const amrex::Vector<amrex::Real>&      visc_coef,
@@ -512,7 +515,7 @@ public:
                   bool                        has_alpha_in,
                   bool                        has_betan,
                   bool                        has_betanp1);
-                           
+
   //
   // Functions for interpolating from cell centers to cell edges
   //
@@ -578,7 +581,7 @@ public:
   static amrex::Vector<amrex::AMRErrorTag> errtags;
 
   amrex::Vector<std::unique_ptr<FluxBoxes> > raii_fbs;
-    
+
   amrex::MultiFab**  EdgeState;
   amrex::MultiFab**  EdgeFlux;
   amrex::MultiFab**  SpecDiffusionFluxn;
@@ -690,10 +693,10 @@ public:
   static int         iter_debug;
   static int         mHtoTiterMAX;
   static amrex::Vector<amrex::Real> mTmpData;
-  
+
 
   static int  ncells_chem;
-  static bool use_typ_vals_chem; 
+  static bool use_typ_vals_chem;
   static amrex::Real relative_tol_chem;
   static amrex::Real absolute_tol_chem;
 

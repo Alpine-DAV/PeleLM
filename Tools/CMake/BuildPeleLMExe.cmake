@@ -12,7 +12,7 @@ function(build_pelelm_exe pelelm_exe_name)
        pelelm_prob.H
        pelelm_prob.cpp
   )
-  
+
   target_include_directories(${pelelm_exe_name} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
   set(PELE_PHYSICS_SRC_DIR ${CMAKE_SOURCE_DIR}/Submodules/PelePhysics)
@@ -77,7 +77,7 @@ function(build_pelelm_exe pelelm_exe_name)
   target_include_directories(${pelelm_exe_name} SYSTEM PRIVATE ${PELE_PHYSICS_SRC_DIR}/Support/Fuego/Evaluation)
   target_include_directories(${pelelm_exe_name} SYSTEM PRIVATE ${PELE_PHYSICS_SRC_DIR}/Utility)
   target_include_directories(${pelelm_exe_name} SYSTEM PRIVATE ${PELE_PHYSICS_SRC_DIR}/Support/Fuego/Mechanism/Models)
-  
+
   if(PELELM_ENABLE_SUNDIALS)
     if(PELELM_ENABLE_CUDA)
       set(DEVICE GPU)
@@ -98,7 +98,7 @@ function(build_pelelm_exe pelelm_exe_name)
       target_link_libraries(${pelelm_exe_name} PRIVATE sundials_nveccuda sundials_sunlinsolcusolversp sundials_sunmatrixcusparse)
     endif()
   endif()
-  
+
   target_sources(${pelelm_exe_name}
      PRIVATE
        ${SRC_DIR}/ArrayViewEXT.H
@@ -114,6 +114,12 @@ function(build_pelelm_exe pelelm_exe_name)
        ${SRC_DIR}/PeleLM_setup.cpp
        ${SRC_DIR}/Prob_F.H
   )
+
+  if(PELELM_ENABLE_ASCENT)
+    # repeated calls to target sources appends
+    target_sources(${pelelm_exe_name} PRIVATE ${SRC_DIR}/PeleLM_Ascent.cpp)
+    target_compile_definitions(${pelelm_exe_name} PRIVATE USE_ASCENT)
+  endif()
 
   target_sources(${pelelm_exe_name}
      PRIVATE
@@ -197,7 +203,7 @@ function(build_pelelm_exe pelelm_exe_name)
          ${IAMR_SRC_DIR}/main.cpp
     )
   endif()
-  
+
   include(AMReXBuildInfo)
   generate_buildinfo(${pelelm_exe_name} ${CMAKE_SOURCE_DIR})
   target_include_directories(${pelelm_exe_name} PRIVATE ${AMREX_SUBMOD_LOCATION}/Tools/C_scripts)
@@ -228,7 +234,7 @@ function(build_pelelm_exe pelelm_exe_name)
     target_include_directories(${pelelm_exe_name} PRIVATE ${IAMR_SRC_DIR}/MOL)
   endif()
 
-  #Keep our Fortran module files confined to a unique directory for each executable 
+  #Keep our Fortran module files confined to a unique directory for each executable
   set_target_properties(${pelelm_exe_name} PROPERTIES Fortran_MODULE_DIRECTORY
                        "${CMAKE_BINARY_DIR}/fortran_modules/${pelelm_exe_name}_fortran_modules")
   target_include_directories(${pelelm_exe_name} PRIVATE ${CMAKE_BINARY_DIR}/fortran_modules/${pelelm_exe_name}_fortran_modules)
@@ -246,8 +252,8 @@ function(build_pelelm_exe pelelm_exe_name)
     set_target_properties(${pelelm_exe_name} PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
     target_compile_options(${pelelm_exe_name} PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-Xptxas --disable-optimizer-constants>)
   endif()
- 
-  #Define what we want to be installed during a make install 
+
+  #Define what we want to be installed during a make install
   install(TARGETS ${pelelm_exe_name}
           RUNTIME DESTINATION bin
           ARCHIVE DESTINATION lib
